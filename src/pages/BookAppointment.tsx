@@ -29,7 +29,7 @@ const generateTimeSlots = (): TimeSlot[] => {
 };
 
 const BookAppointment = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   

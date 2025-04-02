@@ -1,95 +1,119 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useAuth } from "@/context/AuthContext";
 import { mockPatients } from "@/data/mockData";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import PriorityBadge from "@/components/PriorityBadge";
-import { useNavigate } from "react-router-dom";
 
 const PatientProfile = () => {
-  const { user } = useAuth();
+  const { currentUser } = useAuth();
   const { toast } = useToast();
-  const navigate = useNavigate();
   
-  // Find the current patient from mock data
-  const currentPatient = mockPatients.find(p => p.email === user?.email);
+  // Find patient from mock data based on user id
+  const patientData = mockPatients.find(p => currentUser && p.id === currentUser.id);
   
-  const [medicalHistory, setMedicalHistory] = useState(currentPatient?.medicalHistory || "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    name: patientData?.name || "",
+    email: patientData?.email || "",
+    medicalHistory: patientData?.medicalHistory || ""
+  });
   
-  const handleSaveProfile = () => {
-    // In a real app, this would update the database
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+  
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, this would update the user's data in the database
     toast({
       title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
+      description: "Your profile information has been successfully updated."
     });
+    setIsEditing(false);
   };
-
+  
+  if (!patientData) {
+    return (
+      <MainLayout>
+        <div className="text-center py-10">
+          <h2 className="text-2xl font-bold mb-2">Patient Profile Not Found</h2>
+          <p className="text-gray-500">Unable to retrieve your patient information.</p>
+        </div>
+      </MainLayout>
+    );
+  }
+  
   return (
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">My Profile</h2>
-        <Button onClick={() => navigate("/book-appointment")} className="bg-medical-blue hover:bg-medical-blue/90">
-          Book New Appointment
+        <h2 className="text-2xl font-bold">Patient Profile</h2>
+        <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
+          Edit Profile
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="name">Full Name</Label>
-              <Input id="name" value={currentPatient?.name || ""} disabled />
+      <Card>
+        <CardHeader>
+          <CardTitle>Patient Information</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="priority">Priority Level</Label>
+            <PriorityBadge priority={patientData.priorityLevel} />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="medical-history">Medical History</Label>
+            <Textarea
+              id="medical-history"
+              name="medicalHistory"
+              value={formData.medicalHistory}
+              onChange={handleChange}
+              disabled={!isEditing}
+            />
+          </div>
+          {isEditing && (
+            <div className="flex justify-end space-x-2">
+              <Button variant="ghost" onClick={() => setIsEditing(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleSubmit} className="bg-medical-blue hover:bg-medical-blue/90">
+                Save Changes
+              </Button>
             </div>
-            <div>
-              <Label htmlFor="email">Email Address</Label>
-              <Input id="email" value={currentPatient?.email || ""} disabled />
-            </div>
-            <div>
-              <Label htmlFor="priority">Current Priority Level</Label>
-              <div className="mt-2">
-                {currentPatient ? (
-                  <PriorityBadge priority={currentPatient.priorityLevel} />
-                ) : (
-                  "Not set"
-                )}
-                <p className="text-sm text-gray-500 mt-1">
-                  Your priority level is set by healthcare administrators based on your medical condition
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Medical Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="medical-history">Medical History</Label>
-              <Textarea 
-                id="medical-history" 
-                value={medicalHistory}
-                onChange={(e) => setMedicalHistory(e.target.value)}
-                placeholder="Enter any relevant medical history..."
-                className="min-h-[150px]"
-              />
-            </div>
-            <Button onClick={handleSaveProfile} className="bg-medical-blue hover:bg-medical-blue/90">
-              Save Profile
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </MainLayout>
   );
 };
