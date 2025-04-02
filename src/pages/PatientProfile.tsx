@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { useAuth } from "@/context/AuthContext";
@@ -9,15 +10,17 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import PriorityBadge from "@/components/PriorityBadge";
+import { Switch } from "@/components/ui/switch";
 
 const PatientProfile = () => {
-  const { currentUser } = useAuth();
+  const { currentUser, role } = useAuth();
   const { toast } = useToast();
   
   // Find patient from mock data based on user id
   const patientData = mockPatients.find(p => currentUser && p.id === currentUser.id);
   
   const [isEditing, setIsEditing] = useState(false);
+  const [showPrivateInfo, setShowPrivateInfo] = useState(false);
   const [formData, setFormData] = useState({
     name: patientData?.name || "",
     email: patientData?.email || "",
@@ -57,9 +60,21 @@ const PatientProfile = () => {
     <MainLayout>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Patient Profile</h2>
-        <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
-          Edit Profile
-        </Button>
+        <div className="flex gap-3">
+          {role === "patient" && (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="show-private-info"
+                checked={showPrivateInfo}
+                onCheckedChange={setShowPrivateInfo}
+              />
+              <Label htmlFor="show-private-info">Show Sensitive Information</Label>
+            </div>
+          )}
+          <Button onClick={() => setIsEditing(true)} disabled={isEditing}>
+            Edit Profile
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -90,17 +105,27 @@ const PatientProfile = () => {
           </div>
           <div className="space-y-2">
             <Label htmlFor="priority">Priority Level</Label>
-            <PriorityBadge priority={patientData.priorityLevel} />
+            <PriorityBadge 
+              priority={patientData.priorityLevel} 
+              role={role}
+              hideDetails={!showPrivateInfo && role === "patient"}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="medical-history">Medical History</Label>
-            <Textarea
-              id="medical-history"
-              name="medicalHistory"
-              value={formData.medicalHistory}
-              onChange={handleChange}
-              disabled={!isEditing}
-            />
+            {(!showPrivateInfo && role === "patient") ? (
+              <div className="p-2 bg-gray-100 rounded border border-gray-200">
+                <p className="text-gray-500 italic">To view your medical history, toggle "Show Sensitive Information" above.</p>
+              </div>
+            ) : (
+              <Textarea
+                id="medical-history"
+                name="medicalHistory"
+                value={formData.medicalHistory}
+                onChange={handleChange}
+                disabled={!isEditing}
+              />
+            )}
           </div>
           {isEditing && (
             <div className="flex justify-end space-x-2">

@@ -1,14 +1,26 @@
 
-import { PriorityLevel } from "@/types";
+import { PriorityLevel, UserRole } from "@/types";
 import { cn } from "@/lib/utils";
 
 interface PriorityBadgeProps {
   priority: PriorityLevel;
   className?: string;
+  role?: UserRole | null;
+  hideDetails?: boolean;
 }
 
-const PriorityBadge = ({ priority, className }: PriorityBadgeProps) => {
+const PriorityBadge = ({ priority, className, role = null, hideDetails = false }: PriorityBadgeProps) => {
   // Choose more prominent colors for high priority
+  const getLabel = () => {
+    // Hide specific priority levels from patients (when hideDetails is true)
+    if (hideDetails && role !== "admin" && role !== "doctor") {
+      return "Priority Patient";
+    }
+    
+    return priority === "high" ? "High Priority" : 
+           priority === "medium" ? "Medium Priority" : "Low Priority";
+  };
+  
   return (
     <span
       className={cn(
@@ -21,8 +33,7 @@ const PriorityBadge = ({ priority, className }: PriorityBadgeProps) => {
         className
       )}
     >
-      {priority === "high" ? "High Priority" : 
-       priority === "medium" ? "Medium Priority" : "Low Priority"}
+      {getLabel()}
     </span>
   );
 };

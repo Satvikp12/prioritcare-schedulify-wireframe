@@ -10,9 +10,16 @@ import { UserCircle, Users, Calendar, Bell } from "lucide-react";
 const Dashboard = () => {
   const { role, currentUser } = useAuth();
   
-  // Filter today's appointments based on user role
+  // Filter appointments based on user role and status
   const todaysAppointments = mockAppointments
-    .filter(apt => apt.status === "scheduled")
+    .filter(apt => {
+      // For patients, only show their own appointments
+      if (role === "patient") {
+        return apt.status === "scheduled" && currentUser && apt.patientId === currentUser.id;
+      }
+      // For doctors and admins, show all scheduled appointments
+      return apt.status === "scheduled";
+    })
     .slice(0, 3);
   
   // Filter notifications for the current user
@@ -26,14 +33,20 @@ const Dashboard = () => {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">
-              Total Appointments
+              {role === "patient" ? "My Appointments" : "Total Appointments"}
             </CardTitle>
             <Calendar className="h-4 w-4 text-medical-blue" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockAppointments.length}</div>
+            <div className="text-2xl font-bold">
+              {role === "patient" 
+                ? mockAppointments.filter(a => currentUser && a.patientId === currentUser.id).length 
+                : mockAppointments.length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {mockAppointments.filter(a => a.status === "scheduled").length} upcoming
+              {role === "patient"
+                ? mockAppointments.filter(a => currentUser && a.patientId === currentUser.id && a.status === "scheduled").length + " upcoming"
+                : mockAppointments.filter(a => a.status === "scheduled").length + " upcoming"}
             </p>
           </CardContent>
         </Card>
