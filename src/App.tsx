@@ -12,6 +12,8 @@ import Appointments from "./pages/Appointments";
 import UserManagement from "./pages/UserManagement";
 import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
+import PatientProfile from "./pages/PatientProfile";
+import BookAppointment from "./pages/BookAppointment";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
@@ -36,6 +38,21 @@ const AdminRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (role !== "admin") {
+    return <Navigate to="/dashboard" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
+// Patient Route component
+const PatientRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, role } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+  
+  if (role !== "patient") {
     return <Navigate to="/dashboard" replace />;
   }
   
@@ -85,6 +102,22 @@ const AppRoutes = () => {
           <ProtectedRoute>
             <Notifications />
           </ProtectedRoute>
+        } 
+      />
+      <Route 
+        path="/profile" 
+        element={
+          <PatientRoute>
+            <PatientProfile />
+          </PatientRoute>
+        } 
+      />
+      <Route 
+        path="/book-appointment" 
+        element={
+          <PatientRoute>
+            <BookAppointment />
+          </PatientRoute>
         } 
       />
       <Route path="*" element={<NotFound />} />

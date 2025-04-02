@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import MainLayout from "@/components/MainLayout";
 import { mockDoctors, mockPatients } from "@/data/mockData";
@@ -22,13 +21,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { Plus, Search } from "lucide-react";
+import { Plus, Search, Edit } from "lucide-react";
 import PriorityBadge from "@/components/PriorityBadge";
+import { PriorityLevel } from "@/types";
+import { useToast } from "@/hooks/use-toast";
+import { Textarea } from "@/components/ui/textarea";
 
 const UserManagement = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [userType, setUserType] = useState<"doctor" | "patient">("doctor");
+  const [editPatientOpen, setEditPatientOpen] = useState(false);
+  const [selectedPatient, setSelectedPatient] = useState<string | null>(null);
+  const [priorityLevel, setPriorityLevel] = useState<PriorityLevel>("medium");
+  const [condition, setCondition] = useState("");
+  const { toast } = useToast();
 
   // Filter doctors based on search term
   const filteredDoctors = mockDoctors.filter(
@@ -43,6 +50,25 @@ const UserManagement = () => {
       patient.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleEditPatient = (patientId: string) => {
+    const patient = mockPatients.find(p => p.id === patientId);
+    if (patient) {
+      setSelectedPatient(patientId);
+      setPriorityLevel(patient.priorityLevel);
+      setCondition(patient.condition || "");
+      setEditPatientOpen(true);
+    }
+  };
+
+  const handleSavePriority = () => {
+    // In a real app, this would update the database
+    toast({
+      title: "Priority Updated",
+      description: "Patient priority level has been updated successfully.",
+    });
+    setEditPatientOpen(false);
+  };
 
   return (
     <MainLayout>
@@ -115,6 +141,7 @@ const UserManagement = () => {
                     <TableHead>Name</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>Priority</TableHead>
+                    <TableHead>Medical Condition</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -126,9 +153,11 @@ const UserManagement = () => {
                       <TableCell>
                         <PriorityBadge priority={patient.priorityLevel} />
                       </TableCell>
+                      <TableCell>{patient.condition || "Not specified"}</TableCell>
                       <TableCell className="text-right">
-                        <Button variant="ghost" size="sm">
-                          Edit
+                        <Button variant="ghost" size="sm" onClick={() => handleEditPatient(patient.id)}>
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit Priority
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -252,6 +281,58 @@ const UserManagement = () => {
               onClick={() => setAddUserOpen(false)}
             >
               Add User
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Patient Priority Dialog */}
+      <Dialog open={editPatientOpen} onOpenChange={setEditPatientOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Update Patient Priority</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div className="space-y-2">
+              <Label htmlFor="patient-name">Patient</Label>
+              <Input 
+                id="patient-name" 
+                value={selectedPatient ? mockPatients.find(p => p.id === selectedPatient)?.name : ""} 
+                disabled 
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="priority-level">Priority Level</Label>
+              <Select value={priorityLevel} onValueChange={(value: PriorityLevel) => setPriorityLevel(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select priority level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high">High Priority</SelectItem>
+                  <SelectItem value="medium">Medium Priority</SelectItem>
+                  <SelectItem value="low">Low Priority</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="condition">Medical Condition</Label>
+              <Textarea 
+                id="condition" 
+                value={condition} 
+                onChange={(e) => setCondition(e.target.value)}
+                placeholder="Enter patient's medical condition or reason for priority level"
+              />
+            </div>
+          </div>
+          <div className="flex justify-end gap-3 mt-4">
+            <Button variant="outline" onClick={() => setEditPatientOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              className="bg-medical-blue hover:bg-medical-blue/90" 
+              onClick={handleSavePriority}
+            >
+              Save Changes
             </Button>
           </div>
         </DialogContent>

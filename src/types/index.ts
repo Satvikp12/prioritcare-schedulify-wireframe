@@ -23,6 +23,7 @@ export interface Patient {
   email: string;
   medicalHistory?: string;
   priorityLevel: PriorityLevel;
+  condition?: string;
 }
 
 export interface Appointment {
@@ -44,4 +45,15 @@ export interface Notification {
   message: string;
   read: boolean;
   date: string;
+}
+
+export interface TimeSlot {
+  time: string;
+  available: boolean;
+}
+
+export interface DoctorAvailability {
+  doctorId: string;
+  date: string;
+  slots: TimeSlot[];
 }
