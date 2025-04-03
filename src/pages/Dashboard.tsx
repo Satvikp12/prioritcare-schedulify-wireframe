@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { mockAppointments, mockDoctors, mockPatients, mockNotifications } from "@/data/mockData";
 import AppointmentCard from "@/components/AppointmentCard";
 import NotificationItem from "@/components/NotificationItem";
-import { UserCircle, Users, Calendar, Bell } from "lucide-react";
+import { UserCircle, Users, Calendar, Bell, CalendarClock, Clock } from "lucide-react";
 import AdminDashboardAnalytics from "@/components/AdminDashboardAnalytics";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -107,22 +107,21 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      {/* New quick action buttons for patients */}
+      {/* Quick action buttons for patients */}
       {role === "patient" && (
         <div className="flex flex-wrap gap-3 mb-8">
-          <Button onClick={() => navigate("/priority-assessment")} variant="outline" className="gap-2">
-            <span className="relative flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-            </span>
-            Health Assessment
+          <Button onClick={() => navigate("/priority-assessment")} className="gap-2 bg-medical-blue hover:bg-medical-blue/90">
+            <Clock className="h-4 w-4" />
+            Quick Health Assessment
           </Button>
           
-          <Button onClick={() => navigate("/doctor-availability")} variant="outline">
+          <Button onClick={() => navigate("/doctor-availability")} variant="outline" className="gap-2">
+            <CalendarClock className="h-4 w-4" />
             View Doctor Availability
           </Button>
           
-          <Button onClick={() => navigate("/book-appointment")} variant="outline">
+          <Button onClick={() => navigate("/book-appointment")} variant="outline" className="gap-2">
+            <Calendar className="h-4 w-4" />
             Book Appointment
           </Button>
         </div>
