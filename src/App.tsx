@@ -14,6 +14,8 @@ import Settings from "./pages/Settings";
 import Notifications from "./pages/Notifications";
 import PatientProfile from "./pages/PatientProfile";
 import BookAppointment from "./pages/BookAppointment";
+import PriorityAssessment from "./pages/PriorityAssessment";
+import DoctorAvailability from "./pages/DoctorAvailability";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
@@ -117,6 +119,23 @@ const AppRoutes = () => {
         element={
           <PatientRoute>
             <BookAppointment />
+          </PatientRoute>
+        } 
+      />
+      {/* New routes */}
+      <Route 
+        path="/priority-assessment" 
+        element={
+          <PatientRoute>
+            <PriorityAssessment />
+          </PatientRoute>
+        } 
+      />
+      <Route 
+        path="/doctor-availability" 
+        element={
+          <PatientRoute>
+            <DoctorAvailability />
           </PatientRoute>
         } 
       />

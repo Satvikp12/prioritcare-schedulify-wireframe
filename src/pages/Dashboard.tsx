@@ -6,9 +6,13 @@ import { mockAppointments, mockDoctors, mockPatients, mockNotifications } from "
 import AppointmentCard from "@/components/AppointmentCard";
 import NotificationItem from "@/components/NotificationItem";
 import { UserCircle, Users, Calendar, Bell } from "lucide-react";
+import AdminDashboardAnalytics from "@/components/AdminDashboardAnalytics";
+import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const { role, currentUser } = useAuth();
+  const navigate = useNavigate();
   
   // Filter appointments based on user role and status
   const todaysAppointments = mockAppointments
@@ -102,6 +106,35 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* New quick action buttons for patients */}
+      {role === "patient" && (
+        <div className="flex flex-wrap gap-3 mb-8">
+          <Button onClick={() => navigate("/priority-assessment")} variant="outline" className="gap-2">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+            </span>
+            Health Assessment
+          </Button>
+          
+          <Button onClick={() => navigate("/doctor-availability")} variant="outline">
+            View Doctor Availability
+          </Button>
+          
+          <Button onClick={() => navigate("/book-appointment")} variant="outline">
+            Book Appointment
+          </Button>
+        </div>
+      )}
+
+      {/* Admin Analytics Dashboard */}
+      {role === "admin" && (
+        <div className="mb-8">
+          <h2 className="text-xl font-semibold mb-4">Dashboard Analytics</h2>
+          <AdminDashboardAnalytics />
+        </div>
+      )}
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
