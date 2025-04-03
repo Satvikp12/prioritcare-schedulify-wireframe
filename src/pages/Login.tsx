@@ -51,7 +51,7 @@ const Login = () => {
       <div className="container max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-medical-blue">PriorityCare</h1>
-          <p className="text-gray-600 mt-2">Book an Appointment Quickly</p>
+          <p className="text-gray-600 mt-2">Easy, Fast Medical Appointments</p>
         </div>
 
         <Card>
