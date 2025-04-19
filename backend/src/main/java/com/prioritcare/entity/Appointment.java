@@ -1,36 +1,31 @@
-
 package com.prioritcare.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 
-@Entity
-@Table(name = "appointments")
+@Document(collection = "appointments")
 public class Appointment {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
-    @ManyToOne
-    @JoinColumn(name = "patient_id")
+    @DBRef
     private User patient;
 
-    @ManyToOne
-    @JoinColumn(name = "doctor_id")
+    @DBRef
     private User doctor;
 
     private String date;
     private String time;
-
-    @Enumerated(EnumType.STRING)
     private AppointmentStatus status;
-
-    @Enumerated(EnumType.STRING)
     private PriorityLevel priorityLevel;
-
     private String notes;
+    private String symptoms;
+    private String diagnosis;
+    private String prescription;
 
     public enum AppointmentStatus {
-        SCHEDULED, COMPLETED, CANCELLED
+        SCHEDULED, COMPLETED, CANCELLED, RESCHEDULED
     }
 
     public enum PriorityLevel {
@@ -38,11 +33,11 @@ public class Appointment {
     }
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -100,5 +95,30 @@ public class Appointment {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    // New getters and setters
+    public String getSymptoms() {
+        return symptoms;
+    }
+
+    public void setSymptoms(String symptoms) {
+        this.symptoms = symptoms;
+    }
+
+    public String getDiagnosis() {
+        return diagnosis;
+    }
+
+    public void setDiagnosis(String diagnosis) {
+        this.diagnosis = diagnosis;
+    }
+
+    public String getPrescription() {
+        return prescription;
+    }
+
+    public void setPrescription(String prescription) {
+        this.prescription = prescription;
     }
 }
