@@ -1,3 +1,4 @@
+
 package com.prioritcare.service;
 
 import com.prioritcare.entity.User;
@@ -11,8 +12,8 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public String login(String username, String password) {
-        User user = userRepository.findByUsername(username);
+    public String login(String email, String password) {
+        User user = userRepository.findByEmail(email);
         if (user != null && user.getPassword().equals(password)) {
             return "Login successful!";
         }
@@ -20,8 +21,8 @@ public class AuthService {
     }
 
     public String register(User user) {
-        if (userRepository.findByUsername(user.getUsername()) != null) {
-            return "Username already exists";
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return "Email already exists";
         }
         userRepository.save(user);
         return "Registration successful!";
