@@ -1,28 +1,24 @@
-
 package com.prioritcare.entity;
 
-import jakarta.persistence.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
-@Entity
-@Table(name = "users")
+@Document(collection = "users")
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     private String name;
     private String email;
     private String password;
-
-    @Enumerated(EnumType.STRING)
     private Role role;
 
     // Getters and Setters
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
